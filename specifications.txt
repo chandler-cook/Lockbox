@@ -32,13 +32,3 @@
 
 • 2FA functionality
    - Via Google Authenticator
-
-
-
-
-
-
-
-
--Add profile function
-     Take email, username, password, et
