@@ -33,11 +33,15 @@ def startup_page():
             username.destroy()
             pw.destroy()
             back_button.destroy()
+            login.destroy()
             startup.destroy()
             startup_page()
 
         back_button = CTkButton(startup, text="←", command=back)
         back_button.pack()
+
+        login = CTkButton(startup, text="Log In")
+        login.pack()
 
 
     def signup_page():
@@ -78,12 +82,16 @@ def startup_page():
             confirm_pw_label.destroy()
             confirm_pw.destroy()
             back_button.destroy()
+            signup.destroy()
             startup.destroy()
             startup_page()
 
 
         back_button = CTkButton(startup, text="←", command=back)
         back_button.pack()
+
+        signup = CTkButton(startup, text="Sign Up")
+        signup.pack()
 
     lockbox_label=CTkLabel(root, text="Lockbox", font=('Arial', 30))
     desc_label=CTkLabel(root, text="a password manager", font=('Arial', 15))
