@@ -1,0 +1,44 @@
+• Fully functioning GUI
+   - Via tkinter, customtkinter
+   - Start up page with account options
+   - Sign up and log in pages
+   - Profile viewing page post log in
+
+• Save and store hashed Lockbox account information in SQL database
+   - Via tkinter, customtkinter, sqlite3, bcrypt
+   - Hash account info using the Blowfish encryption algorithm
+   - Send hashed account info into SQL database
+   - Check login info against SQL database
+
+• Add profile functionality
+   - Via tkinter, customtkinter, sqlite3, bcrypt
+   - Allow user to input a email, username, and password associated with a website
+   - Hash user inputted account info
+   - Send hashed account info into SQL database
+
+• Generate password functionality
+   - Via secrets
+   - Allow user to choose number of characters
+   - Allow user to choose type of characters
+      • capital/lowercase
+      • letters, numbers, special
+
+• Copy to clipboard functionality
+   - Via pyperclip
+
+• Open associated website functionality
+
+• Autolock functionality
+
+• 2FA functionality
+   - Via Google Authenticator
+
+
+
+
+
+
+
+
+-Add profile function
+     Take email, username, password, et
