@@ -166,6 +166,9 @@ class LockboxApp:
         new_password = self.pw_entry.get()
         # Retrieve the confirmation password entered by the user
         confirm_password = self.confirm_pw_entry.get()
+        
+        self.username = new_username
+        
 
         # The user must put a username and password
         if new_username == '' or new_password == '':
@@ -248,34 +251,7 @@ class LockboxApp:
         back_button = CTkButton(self.root, text="←", command=self.show_menu)
         back_button.pack()
 
-    # Define the method to save new website details entered by the user
-    def save_website_details(self):
-        # Retrieve the entered website name from the website name entry widget
-        website_name = self.website_name_entry.get()
-        # Retrieve the entered username for the website from the username entry widget
-        website_username = self.website_username_entry.get()
-        # Retrieve the entered password for the website from the password entry widget
-        website_password = self.website_pw_entry.get()
-
-        # Retrieve the current user's username from the stored attribute to associate with the website details
-        username = self.username
-
-        # Call the method to get the account ID for the current user based on their username
-        # This is necessary to relate the website details with the specific user account in the database
-        account_id = self.get_user_account_id(username)
-
-        # Attempt to insert the new website details into the database
-        try:
-            # This method attempts to insert a new row into the database table for websites
-            # It includes the current username, website name, website username, and password as parameters
-            self.insert_new_website(self.username, website_name, website_username, website_password)
-            # If the insert is successful, print a confirmation message
-            print("Website details saved successfully!")
-        # Handle any exceptions that occur during the database insert operation
-        except Exception as e:
-            # If an exception occurs, show an error message with the exception details
-            self.show_message("error", "Failed to save website details. Error: " + str(e))
-
+   
     # Define the method to display the webpage credentials associated with the user
     def view_websites_page(self):
         # Clear the current GUI widgets to prepare for new content
@@ -385,6 +361,36 @@ class LockboxApp:
             if con:
                 con.close()
 
+
+     # Define the method to save new website details entered by the user
+    def save_website_details(self):
+        # Retrieve the entered website name from the website name entry widget
+        website_name = self.website_name_entry.get()
+        # Retrieve the entered username for the website from the username entry widget
+        website_username = self.website_username_entry.get()
+        # Retrieve the entered password for the website from the password entry widget
+        website_password = self.website_pw_entry.get()
+        
+
+        # Retrieve the current user's username from the stored attribute to associate with the website details
+        username = self.username
+
+        # Call the method to get the account ID for the current user based on their username
+        # This is necessary to relate the website details with the specific user account in the database
+        account_id = self.get_user_account_id(username)
+
+        # Attempt to insert the new website details into the database
+        try:
+            # This method attempts to insert a new row into the database table for websites
+            # It includes the current username, website name, website username, and password as parameters
+            self.insert_new_website(username, website_name, website_username, website_password)
+            # If the insert is successful, print a confirmation message
+            print("Website details saved successfully!")
+        # Handle any exceptions that occur during the database insert operation
+        except Exception as e:
+            # If an exception occurs, show an error message with the exception details
+            self.show_message("error", "Failed to save website details. Error: " + str(e))
+
     # Define a method to insert new website credentials into the database for a given user
     def insert_new_website(self, username, website_name, website_username, website_password):
         # Establish a connection to the SQLite database named 'lockbox.db'
@@ -394,9 +400,12 @@ class LockboxApp:
 
         # Execute a SQL query to select the ID of the user ('lockbox_account_id') from the 'lockbox_accounts' table
         # based on the provided username
-        cur.execute("SELECT id FROM lockbox_accounts WHERE username=?", (username,))
+        cur.execute("SELECT id FROM lockbox_accounts WHERE username=?", (username),)
+        
+        print(username)
         # Fetch the first row of the result set (if any)
         account_id = cur.fetchone()
+        print(account_id)
 
         # If no account ID was found for the given username, print an error message, close the database connection,
         # and return False to indicate failure
