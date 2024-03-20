@@ -8,18 +8,19 @@ def create_tables():
 
     # Create lockbox_accounts table if it doesn't exist
     cur.execute('''CREATE TABLE IF NOT EXISTS lockbox_accounts (
-        username TEXT PRIMARY KEY,
-        password TEXT
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
     )''')
 
-    # Create profiles table if it doesn't exist
-    cur.execute('''CREATE TABLE IF NOT EXISTS profiles (
-        username TEXT,
-        website TEXT,
-        email TEXT,
-        password TEXT,
-        FOREIGN KEY (username) REFERENCES lockbox_accounts(username),
-        PRIMARY KEY (username, website)
+    # Create websites table if it doesn't exist
+    cur.execute('''CREATE TABLE IF NOT EXISTS websites (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        lockbox_account_id INTEGER NOT NULL,
+        website_name TEXT NOT NULL,
+        website_username TEXT NOT NULL,
+        website_password TEXT NOT NULL,
+        FOREIGN KEY (lockbox_account_id) REFERENCES lockbox_accounts(id)
     )''')
 
     # Commit changes and close connection
@@ -55,39 +56,25 @@ def authenticate_user(username, password):
         # Check if the provided password matches the hashed password
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
             print("Login successful!")
-            cur.execute("SELECT * FROM profiles WHERE username=?", (username,))
+            cur.execute("SELECT * FROM websites WHERE lockbox_account_id=(SELECT id FROM lockbox_accounts WHERE username=?)", (username,))
             profile_data = cur.fetchall()
             con.close()
-    
+
             if profile_data:  # Check if any profile data was fetched
                 return profile_data, None  # Return profile data and no error message
             else:
-                return [], "No profile data found for the user."  # Return an empty profile_data list
-        else:
-            return None, "Incorrect password!"
-    else:
-        return None, "Username does not exist!"
+                return None, "No profile data found for the user."  # Return special value indicating no profile data
     con.close()
+    return None, "Invalid username or password."
 
-def insert_new_profile(username, website, email, password):
+
+def insert_new_website(username, website_name, website_username, website_password):
     # Connect to the database
     con = sqlite3.connect("lockbox.db")
     cur = con.cursor()
 
-    # Insert the new profile into the profiles table
-    cur.execute("INSERT INTO profiles (username, website, email, password) VALUES (?, ?, ?, ?)", (username, website, email, password))
-    con.commit()
-
-    # Create a new table for the profile (if not exists)
-    # This table will store website-specific username and password
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS {website}_profile (
-                        username TEXT,
-                        password TEXT,
-                        FOREIGN KEY (username) REFERENCES lockbox_accounts(username),
-                        PRIMARY KEY (username, password)
-                    )''')
-    # Insert username and password for the website into the corresponding profile table
-    cur.execute(f"INSERT INTO {website}_profile (username, password) VALUES (?, ?)", (username, password))
+    # Insert the new website into the websites table
+    cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES ((SELECT id FROM lockbox_accounts WHERE username=?), ?, ?, ?)", (username, website_name, website_username, website_password))
     con.commit()
 
     # Close connection
