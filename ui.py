@@ -345,9 +345,9 @@ class LockboxApp:
         # Call the messagebox's show<message type> function to display a dialog box
         # The first parameter is the title of the message box
         # The `message` parameter contains the message text to be displayed
-        if message_type == "error" or "Error":
+        if message_type == "error" or message_type == "Error":
             messagebox.showerror("Error", message)
-        elif message_type == "success" or "Success":
+        elif message_type == "success" or  message_type == "Success":
             messagebox.showinfo("Success", message)
 
     # Define a method to remove all child widgets from the root widget
