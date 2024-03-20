@@ -47,6 +47,12 @@ def authenticate_user(username, password):
     con = sqlite3.connect("lockbox.db")
     cur = con.cursor()
 
+
+
+# uses parameterized queries correctly with the ? placeholder for the SQL parameter, 
+# and then provides the actual parameter values ((username,)) separately. This method prevents 
+# the SQL engine from executing any unintended SQL commands. (SQLi)
+
     # Query the database to check if the username exists
     cur.execute("SELECT password FROM lockbox_accounts WHERE username=?", (username,))
     result = cur.fetchone()
