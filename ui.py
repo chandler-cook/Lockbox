@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from customtkinter import *
+import customtkinter
 from DB import *
 
 class LockboxApp:
@@ -116,7 +117,7 @@ class LockboxApp:
             print("Login failed. Please try again.")
             print("Error:", error_message)
             # Show the error message using a custom method
-            self.show_error_message(error_message)
+            self.show_message("error", error_message)
 
     # Define the method to display the sign-up page
     def signup_page(self):
@@ -165,7 +166,7 @@ class LockboxApp:
         # Check if the entered password and confirmation password match
         if new_password != confirm_password:
             # If they don't match, print an error message and exit the function early
-            print("Passwords don't match!")
+            self.show_message("error", "The passwords entered do not match. Please try again")
             return
 
         # Attempt to create a new user with the provided credentials
@@ -174,12 +175,12 @@ class LockboxApp:
             # It will raise an sqlite3.IntegrityError if the username already exists
             insert_new_user(new_username, new_password)
             # If the insertion is successful, display a success message
-            self.show_error_message("Success. New user has been created")
+            self.show_message("success", "New user has been created")
             print("User signed up successfully!")
         # Handle the case where the username already exists in the database
         except sqlite3.IntegrityError:
             # Display an error message prompting the user to choose a different username
-            self.show_error_message("Username already exists. Please choose a different username.")
+            self.show_message("error", "Username already exists. Please choose a different username.")
 
     # Define the method to display the main menu options to the user
     def show_menu(self):
@@ -262,7 +263,7 @@ class LockboxApp:
         # Handle any exceptions that occur during the database insert operation
         except Exception as e:
             # If an exception occurs, show an error message with the exception details
-            self.show_error_message("Failed to save website details. Error: " + str(e))
+            self.show_message("error", "Failed to save website details. Error: " + str(e))
 
     # Define the method to display the webpage credentials associated with the user
     def view_websites_page(self):
@@ -329,11 +330,14 @@ class LockboxApp:
         return bool(website_data)
 
     # Define a method to display an error message in a graphical message box
-    def show_error_message(self, message):
-        # Call the messagebox's showerror function to display an error dialog box
-        # "Error" is the title of the message box
-        # The `message` parameter contains the error message text to be displayed
-        messagebox.showerror("Error", message)
+    def show_message(self, message_type, message):
+        # Call the messagebox's show<message type> function to display a dialog box
+        # The first parameter is the title of the message box
+        # The `message` parameter contains the message text to be displayed
+        if message_type == "error" or "Error":
+            messagebox.showerror("Error", message)
+        elif message_type == "success" or "Success":
+            messagebox.showinfo("Success", message)
 
     # Define a method to remove all child widgets from the root widget
     def clear_widgets(self):
@@ -408,6 +412,10 @@ class LockboxApp:
 root = CTk()
 root.geometry("500x300")
 root.title("Lockbox")
+
+# Sets default appearance and theme of window
+customtkinter.set_appearance_mode("dark")
+customtkinter.set_default_color_theme("dark-blue")
 
 # Creating an instance of the LockboxApp class, passing the root window as a parameter.
 # This step initializes the application with the root window as its main interface.
