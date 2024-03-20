@@ -9,6 +9,7 @@ class LockboxApp:
     def __init__(self, root):
         self.root = root
         self.username = None  # Initialize username
+        self.profile_id = None
         self.startup_page()
 
     # Define the startup page setup method
@@ -86,7 +87,8 @@ class LockboxApp:
         profile_data, error_message = authenticate_user(username, password)
 
         # Set the username attribute of the class to the entered username
-        self.username = username  
+        self.username = username
+        self.profile_id = username  
 
         # If profile data is received, the login is successful
         if profile_data:
@@ -94,21 +96,22 @@ class LockboxApp:
             # Reiterate setting the username attribute for clarity or potential previous misuse
             self.username = username
             # Offer the user options for next steps
-            print("Would you like to:")
-            print("1. View existing websites")
-            print("2. Add a new website")
+            self.show_menu()
+            # print("Would you like to:")
+            # print("1. View existing websites")
+            # print("2. Add a new website")
             
             # Get the user's choice through input
-            choice = input("Enter your choice (1 or 2): ")
+            #choice = input("Enter your choice (1 or 2): ")
             # If choice is 1, call the method to view existing websites
-            if choice == "1":
-                self.view_websites_page()
+            # if choice == "1":
+            #     self.view_websites_page()
             # If choice is 2, call the method to add a new website
-            elif choice == "2":
-                self.add_website_page()
+            # elif choice == "2":
+            #     self.add_website_page()
             # Handle invalid choices by informing the user
-            else:
-                print("Invalid choice. Please enter 1 or 2.")
+            # else:
+            #     print("Invalid choice. Please enter 1 or 2.")
         # If no profile data is found for the user, inform them and direct to add a new website
         elif error_message == "No profile data found for the user.":
             print("No profile data found for the user.")
@@ -183,6 +186,8 @@ class LockboxApp:
             # If the insertion is successful, display a success message
             self.show_message("success", "New user has been created")
             print("User signed up successfully!")
+            #Opens the main menu page
+            self.show_menu()
         # Handle the case where the username already exists in the database
         except sqlite3.IntegrityError:
             # Display an error message prompting the user to choose a different username
