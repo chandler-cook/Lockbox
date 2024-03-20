@@ -164,9 +164,14 @@ class LockboxApp:
         # Retrieve the confirmation password entered by the user
         confirm_password = self.confirm_pw_entry.get()
 
+        # The user must put a username and password
+        if new_username == '' or new_password == '':
+            self.show_message("error", "You must have a username and password")
+            return
+
         # Check if the entered password and confirmation password match
         if new_password != confirm_password:
-            # If they don't match, print an error message and exit the function early
+            # If they don't match, print an error message
             self.show_message("error", "The passwords entered do not match. Please try again")
             return
 
