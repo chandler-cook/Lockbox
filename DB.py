@@ -1,51 +1,97 @@
 import sqlite3
 import bcrypt
 
+def create_tables():
+    # Connect to the database
+    con = sqlite3.connect("lockbox.db")
+    cur = con.cursor()
 
-"""""
-INSERT INTO users (name, age): 
-This part specifies the table name (users) and the columns (name and age) into which data will be inserted.
+    # Create lockbox_accounts table if it doesn't exist
+    cur.execute('''CREATE TABLE IF NOT EXISTS lockbox_accounts (
+        username TEXT PRIMARY KEY,
+        password TEXT
+    )''')
 
-VALUES (?, ?): 
-This part specifies the values to be inserted into the specified columns. The ? placeholders are parameter markers used for parameterized queries to prevent SQL injection attacks and ensure data integrity.
+    # Create profiles table if it doesn't exist
+    cur.execute('''CREATE TABLE IF NOT EXISTS profiles (
+        username TEXT,
+        website TEXT,
+        email TEXT,
+        password TEXT,
+        FOREIGN KEY (username) REFERENCES lockbox_accounts(username),
+        PRIMARY KEY (username, website)
+    )''')
 
-('Gabriel Adams', 'BigDaddy@gmail.com', '1234'): 
-These are tuples containing the actual values to be inserted into the respective columns. In the first INSERT statement, 'Alice' will be inserted into the name column and 30 will be inserted into the age column. In the second INSERT statement, 'Bob' will be inserted into the name column and 25 will be inserted into the age column.
+    # Commit changes and close connection
+    con.commit()
+    con.close()
 
-By using parameterized queries (VALUES (?, ?, ?)), you separate the SQL query from the data. THIS HELPS PREVENT SQL INJECTION ATTACKS because the parameters are passed separately from the SQL query, making it impossible for an attacker to inject malicious SQL code into the query. Additionally, it ensures data integrity and proper handling of special characters in the data.
-"""""
-# Making connection to lockbox.db database
-con = sqlite3.connect("lockbox.db")
-cur = con.cursor()
+def insert_new_user(username, password):
+    # Connect to the database
+    con = sqlite3.connect("lockbox.db")
+    cur = con.cursor()
 
-cur.execute('''CREATE TABLE IF NOT EXISTS lockbox_accounts (
-    username TEXT,
-    email TEXT,
-    password TEXT
-)''')
+    # Hash the password before storing it in the database
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-cur.execute('''CREATE TABLE IF NOT EXISTS profiles (
-    website TEXT,
-    email TEXT,
-    username TEXT,
-    password TEXT
-)''')
+    # Insert the new user into the lockbox_accounts table
+    cur.execute("INSERT INTO lockbox_accounts (username, password) VALUES (?, ?)", (username, hashed_password))
+    con.commit()
 
-# Adding an instance in the database lockbox_accounts
-cur.execute("INSERT INTO lockbox_accounts (username, email, password) VALUES (?, ?, ?)", ('Gabriel Adams', 'BigDaddy@gmail.com', '1234'))
+    # Close connection
+    con.close()
 
-# Deleting a row from the database lockbox_accounts
-cur.execute("DELETE FROM lockbox_accounts WHERE username = ? AND email = ? AND password = ?", ('Gabriel Adams', 'BigDaddy@gmail.com', '1234'))
+def authenticate_user(username, password):
+    # Connect to the database
+    con = sqlite3.connect("lockbox.db")
+    cur = con.cursor()
 
-# Save (commit) the changes
-con.commit()
+    # Query the database to check if the username exists
+    cur.execute("SELECT password FROM lockbox_accounts WHERE username=?", (username,))
+    result = cur.fetchone()
 
-# Retrieve data from the table
-cur.execute("SELECT * FROM lockbox_accounts")
-rows = cur.fetchall()
-for row in rows:
-    print(row)
+    if result:  # If username exists
+        hashed_password = result[0]
+        # Check if the provided password matches the hashed password
+        if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            print("Login successful!")
+            cur.execute("SELECT * FROM profiles WHERE username=?", (username,))
+            profile_data = cur.fetchall()
+            con.close()
+    
+            if profile_data:  # Check if any profile data was fetched
+                return profile_data, None  # Return profile data and no error message
+            else:
+                return [], "No profile data found for the user."  # Return an empty profile_data list
+        else:
+            return None, "Incorrect password!"
+    else:
+        return None, "Username does not exist!"
+    con.close()
 
-# Close the cursor and the connection
-cur.close()
-con.close()
+def insert_new_profile(username, website, email, password):
+    # Connect to the database
+    con = sqlite3.connect("lockbox.db")
+    cur = con.cursor()
+
+    # Insert the new profile into the profiles table
+    cur.execute("INSERT INTO profiles (username, website, email, password) VALUES (?, ?, ?, ?)", (username, website, email, password))
+    con.commit()
+
+    # Create a new table for the profile (if not exists)
+    # This table will store website-specific username and password
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {website}_profile (
+                        username TEXT,
+                        password TEXT,
+                        FOREIGN KEY (username) REFERENCES lockbox_accounts(username),
+                        PRIMARY KEY (username, password)
+                    )''')
+    # Insert username and password for the website into the corresponding profile table
+    cur.execute(f"INSERT INTO {website}_profile (username, password) VALUES (?, ?)", (username, password))
+    con.commit()
+
+    # Close connection
+    con.close()
+
+# Call create_tables function to ensure tables exist
+create_tables()
