@@ -4,6 +4,7 @@ from customtkinter import *
 import customtkinter
 from DB import *
 
+
 class LockboxApp:
     def __init__(self, root):
         self.root = root
