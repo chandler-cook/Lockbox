@@ -67,7 +67,7 @@ class Account():
             self.gui.show_message("success", "New user has been created") # If the insertion is successful, display a success message
             print("User signed up successfully!")
             
-            self.gui.show_menu() #Opens the main menu page
+            self.gui.menu_page() #Opens the main menu page
         # Handle the case where the username already exists in the database
         except sqlite3.IntegrityError:
             # Display an error message prompting the user to choose a different username
