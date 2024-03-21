@@ -138,21 +138,21 @@ class GUI():
         website_label.pack()
 
         # Set up an entry widget for the user to input the name of the website
-        self.website_url_entry = CTkEntry(self.root, placeholder_text="URL")
-        self.website_url_entry.pack()
+        website_url_entry = CTkEntry(self.root, placeholder_text="URL")
+        website_url_entry.pack()
 
         # Set up an entry widget for the user to input their username for the website
-        self.website_username_entry = CTkEntry(self.root, placeholder_text="Username")
-        self.website_username_entry.pack()
+        website_username_entry = CTkEntry(self.root, placeholder_text="Username")
+        website_username_entry.pack()
 
         # Set up an entry widget for the user to input their password for the website
         # Entered text is obscured (shown as '*') for privacy
-        self.website_pw_entry = CTkEntry(self.root, placeholder_text="Password", show='*')
-        self.website_pw_entry.pack()
+        website_pw_entry = CTkEntry(self.root, placeholder_text="Password", show='*')
+        website_pw_entry.pack()
 
         # Create a button labeled "Save" that, when clicked, calls the save_website_details method
         # This method is presumably responsible for processing and storing the entered website information
-        save_btn = CTkButton(self.root, text="Save", command=self.db.save_website_details)
+        save_btn = CTkButton(self.root, text="Save", command=lambda:self.db.save_website_details(website_url_entry.get(), website_username_entry.get(), website_pw_entry.get()))
         save_btn.pack()
 
         # Create a back button that allows users to return to the main menu
