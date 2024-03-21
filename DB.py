@@ -114,15 +114,14 @@ class Database():
         con.close() # Close connection
 
     # Define the method to save new website details entered by the user
-    def save_website_details(self):
+    def save_website_details(self, website_url_entry, website_username_entry, website_pw_entry):
         # Retrieve the entered website name from the website name entry widget
-        website_name = self.website_name_entry.get()
+        website_url = website_url_entry
         # Retrieve the entered username for the website from the username entry widget
-        website_username = self.website_username_entry.get()
+        website_username = website_username_entry
         # Retrieve the entered password for the website from the password entry widget
-        website_password = self.website_pw_entry.get()
+        website_password = website_pw_entry
         
-
         # Retrieve the current user's username from the stored attribute to associate with the website details
         username = self.username
 
@@ -134,13 +133,15 @@ class Database():
         try:
             # This method attempts to insert a new row into the database table for websites
             # It includes the current username, website name, website username, and password as parameters
-            self.insert_new_website(username, website_name, website_username, website_password)
+            self.insert_new_website(username, website_url, website_username, website_password)
             # If the insert is successful, print a confirmation message
             print("Website details saved successfully!")
         # Handle any exceptions that occur during the database insert operation
         except Exception as e:
             # If an exception occurs, show an error message with the exception details
             self.show_message("error", "Failed to save website details. Error: " + str(e))
+
+        self.menu_page()
 
     # Define a method to check if website data exists for the user's account
     def check_website_data(self):
