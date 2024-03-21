@@ -1,3 +1,5 @@
+Lockbox/bin/
+Lockbox/lib/
 __pycache__/
 '*.pyc'
 '*.pyc.icloud'
