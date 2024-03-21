@@ -1,8 +1,8 @@
 import customtkinter
 from customtkinter import *
 from account import Account
-from gui import GUI 
-from db import Database
+from GUI import GUI 
+from DB import Database
 
 root = CTk() # create a root customtkinter window
 root.title("Lockbox") # set the title of the window
