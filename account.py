@@ -1,4 +1,8 @@
 import sqlite3
+import string
+import secrets
+import pyperclip
+import random
 
 class Account():
     def __init__(self, root, gui_instance, db_instance):
@@ -70,3 +74,49 @@ class Account():
             # Display an error message prompting the user to choose a different username
             self.gui.show_message("error", "Username already exists. Please choose a different username.")
             return
+        # Method for generating a password based on the parameters set by the user
+    def generate_pass(self, username, length, upper, lower, digit, special):
+        un=username
+        # Password length variable
+        pass_len = int(length.get())
+        # Variables holding value of checked boxes (1 = checked, 0 = unchecked)
+        upperVar = upper.get()
+        lowerVar = lower.get()
+        digitVar = digit.get()
+        specialVar = special.get()
+        #Initialize character bank and blank new password list for generation
+        char_bank = ''
+        new_pass = []
+        if (upperVar+lowerVar+digitVar+specialVar) == 0:
+            self.gui.show_message('error', 'You must select at least one password option to generate a new password.\nPlease try again.')
+            self.gui.generate_pass_page(un)
+            return
+        # IF structure for determining what characters to include in the character bank the generator will chose from
+        # Also ensures there is at least one instance of each user specified character
+        if upperVar == 1:
+            # If "Inlcude Uppercase letter" box is checked, include all uppercase letters in the character bank,
+            # and add one uppercase letter to the new password, same for rest
+            char_bank = string.ascii_uppercase
+            new_pass.append(secrets.choice(string.ascii_uppercase))
+        if lowerVar == 1:
+            char_bank += string.ascii_lowercase
+            new_pass.append(secrets.choice(string.ascii_lowercase))
+        if digitVar == 1:
+            char_bank += string.digits
+            new_pass.append(secrets.choice(string.digits))
+        if specialVar == 1:
+            char_bank += string.punctuation
+            new_pass.append(secrets.choice(string.punctuation))
+        # Fill the rest of the password with random characters from the combined character bank
+        while len(new_pass) < pass_len:    
+            new_pass.append(secrets.choice(char_bank))
+        # Shuffle the password to mix the initial characters
+        random.shuffle(new_pass)
+        # Convert the list of characters back into a string
+        new_pass = ''.join(new_pass)    
+        # Copies the Generated password to user's clipboard
+        pyperclip.copy(new_pass)
+        # Success Message
+        self.gui.show_message("success", f"Your generated password is: {new_pass}\nYour password has been automaticaly copied to the clipboard." )
+        # Go back to main menu after exiting success message
+        self.gui.menu_page(un)

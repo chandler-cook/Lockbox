@@ -2,6 +2,7 @@ from customtkinter import *
 from tkinter import messagebox
 import sqlite3
 
+
 class GUI():
     def __init__(self, root, account_instance, db_instance):
         self.root = root
@@ -129,6 +130,9 @@ class GUI():
         # of websites associated with their account
         view_websites_btn = CTkButton(self.root, text="View Websites", command=lambda:self.view_websites_page(un))
         view_websites_btn.pack() # Adds view website button to application window
+        # Creates the generate password button in main menu, invoking the generate_pass_page when user clicks
+        pass_gen_btn = CTkButton(self.root, text="Generate New Password", command=lambda:self.generate_pass_page(un))
+        pass_gen_btn.pack()
 
     # Define a method to display the page for adding new website information
     def add_website_page(self, username):
@@ -208,4 +212,59 @@ class GUI():
         # Add a back button to the GUI that, when clicked, will call the menu_page method
         # to return the user to the main menu
         back_button = CTkButton(self.root, text="← Back to Menu", command=lambda:self.menu_page(un))
+        back_button.pack()
+        #Define a method to display the page for generating a new password
+    def generate_pass_page(self, username):
+        un=username
+        # Clear any existing widgets to prepare for displaying new options
+        self.clear_widgets()
+        # Method for updating the value of the slider
+        def sliding_value(value):
+            slider_value_label.configure(text=f"Character Count: {int(value)}", font=('Arial Bold', 14))
+        # Frame to hold the slider and its value label
+        slider_frame = CTkFrame(self.root, fg_color="transparent")
+        slider_frame.pack(pady=10)
+        # Create the slider
+        char_len_slider = CTkSlider(slider_frame,
+                                from_=4,
+                                to=32,
+                                width=160,
+                                height=16,
+                                border_width=5.5,
+                                command=sliding_value)
+        # Initialize slider value to 8, but minimum is 4 as seen above with "from_=4"
+        char_len_slider.set(8)
+        # Label to display the slider's value, placed above the slider
+        slider_value_label = CTkLabel(slider_frame, text=f"Character Count: {char_len_slider.get()}", font=('Arial Bold', 14))
+        slider_value_label.pack(side='top')
+        # Place slider
+        char_len_slider.pack(side='top')
+        # Label that tells the user to select one of the password checkbox options
+        # in order to avoid error when trying to generate password without any characters
+        user_option_warning = CTkLabel(self.root, text="Please Select at Least One of the Following", font=('Arial Bold', 15), text_color='red') 
+        user_option_warning.pack()
+        # Frame to hold all the checkboxes
+        checkbox_frame = CTkFrame(self.root, fg_color="transparent")
+        checkbox_frame.pack(pady=10) 
+        #Check Boxes for including certain characters
+        include_upper_box = CTkCheckBox(checkbox_frame, text="Include Uppercase Letters", font=('Arial Bold', 14))
+        include_upper_box.pack(padx=10, anchor='w')
+        include_lower_box = CTkCheckBox(checkbox_frame, text="Include Lowercase Letters", font=('Arial Bold', 14))
+        include_lower_box.pack(padx=10, anchor='w')
+        include_digit_box = CTkCheckBox(checkbox_frame, text="Include Digits", font=('Arial Bold', 14))
+        include_digit_box.pack(padx=10, anchor='w')
+        include_special_box = CTkCheckBox(checkbox_frame, text="Include Special Characters", font=('Arial Bold', 14))
+        include_special_box.pack(padx=10, anchor='w')
+        # Storing user specified values for pass generation as
+        # shorter varaible names for passing to generate_pass function in accounts
+        length=char_len_slider
+        u=include_upper_box
+        l=include_lower_box
+        d=include_digit_box
+        spec=include_special_box
+        # Button that calls the generate_pass function, using the shortened variable names as arguments
+        generate_pass_btn = CTkButton(self.root, text="Generate Password", command=lambda:self.account.generate_pass(un, length, u, l, d, spec))
+        generate_pass_btn.pack()
+        # Takes user back to main menu if they don't want to generate a password
+        back_button = CTkButton(self.root, text="←", command=lambda:self.menu_page(un))
         back_button.pack()
