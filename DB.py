@@ -59,6 +59,9 @@ class Database():
         
     def authenticate_user(self, username, password):
         
+        un = username
+        pw = password
+
         con = sqlite3.connect("lockbox.db") # Connect to the database
         cur = con.cursor() # Create a cursor object to execute SQL commands
 
@@ -67,15 +70,15 @@ class Database():
         # the SQL engine from executing any unintended SQL commands. (SQLi)
 
         # Query the database to check if the username exists
-        cur.execute("SELECT password FROM lockbox_accounts WHERE username=?", (username,))
+        cur.execute("SELECT password FROM lockbox_accounts WHERE username=?", (un,))
         result = cur.fetchone()
 
         if result:  # If username exists
             hashed_password = result[0]
             # Check if the provided password matches the hashed password
-            if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            if bcrypt.checkpw(pw.encode('utf-8'), hashed_password):
                 print("Login successful!")
-                cur.execute("SELECT * FROM websites WHERE lockbox_account_id=(SELECT id FROM lockbox_accounts WHERE username=?)", (username,))
+                cur.execute("SELECT * FROM websites WHERE lockbox_account_id=(SELECT id FROM lockbox_accounts WHERE username=?)", (un,))
                 profile_data = cur.fetchall()
                 con.close()
 

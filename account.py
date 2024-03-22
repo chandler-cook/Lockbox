@@ -9,12 +9,12 @@ class Account():
     # Define the method to handle the login logic
     def perform_login(self, username, password):
 
-        #username = self.gui.username_entry.get() # Retrieve the username from the username entry widget
-        #password = self.gui.pw_entry.get() # Retrieve the password from the password entry widget
+        un = username # Retrieve the username from sent parameters
+        pw = password # Retrieve the password from sent parameters
 
         # Attempt to authenticate the user with the provided username and password
         # authenticate_user returns a tuple containing profile data and an error message (if any)
-        profile_data, error_message = self.db.authenticate_user(username, password)
+        profile_data, error_message = self.db.authenticate_user(un, pw)
 
         self.username = username # Set the username attribute of the class to the entered username
         self.profile_id = username  
@@ -29,7 +29,7 @@ class Account():
         # If no profile data is found for the user, inform them and direct to add a new website
         elif error_message == "No profile data found for the user.":
             print("No profile data found for the user.")
-            self.gui.add_website_page()
+            self.gui.add_website_page(un)
         # If login failed due to other errors, inform the user and display the error message
         else:
             print("Login failed. Please try again.")
@@ -38,18 +38,16 @@ class Account():
             self.gui.show_message("error", error_message)
 
     # Define the method to handle the signup process
-    def perform_signup(self, username, pw, cpw): 
+    def perform_signup(self, username, password, confirm_password): 
         # Retrieve the username entered by the user
-        # username
+        un = username
         # Retrieve the password entered by the user
-        # pw
+        pw = password
         # Retrieve the confirmation password entered by the user
-        # cpw
-        
-        # username is being used directly
+        cpw = confirm_password
         
         # The user must put a username and password
-        if username == '' or pw == '':
+        if un == '' or pw == '':
             self.gui.show_message("error", "You must have a username and password")
             return
 
@@ -63,12 +61,12 @@ class Account():
         try:
             # This function attempts to insert a new user record into the database
             # It will raise an sqlite3.IntegrityError if the username already exists
-            self.db.insert_user(username, pw)
+            self.db.insert_user(un, pw)
             self.gui.show_message("success", "New user has been created") # If the insertion is successful, display a success message
             print("User signed up successfully!")
-            
-            self.gui.menu_page(username) #Opens the main menu page
+            self.gui.login_page() #Opens the main menu page
         # Handle the case where the username already exists in the database
         except sqlite3.IntegrityError:
             # Display an error message prompting the user to choose a different username
             self.gui.show_message("error", "Username already exists. Please choose a different username.")
+            return
