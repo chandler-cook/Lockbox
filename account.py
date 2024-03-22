@@ -29,7 +29,7 @@ class Account():
         # If no profile data is found for the user, inform them and direct to add a new website
         elif error_message == "No profile data found for the user.":
             print("No profile data found for the user.")
-            self.gui.add_website_page()
+            self.gui.add_website_page(self.username)
         # If login failed due to other errors, inform the user and display the error message
         else:
             print("Login failed. Please try again.")
@@ -38,18 +38,16 @@ class Account():
             self.gui.show_message("error", error_message)
 
     # Define the method to handle the signup process
-    def perform_signup(self, username, pw, cpw): 
+    def perform_signup(self, username, password, confirmpw): 
         # Retrieve the username entered by the user
-        # username
+        un = username
         # Retrieve the password entered by the user
-        # pw
+        pw = password
         # Retrieve the confirmation password entered by the user
-        # cpw
-        
-        # username is being used directly
+        cpw = confirmpw
         
         # The user must put a username and password
-        if username == '' or pw == '':
+        if un == '' or pw == '':
             self.gui.show_message("error", "You must have a username and password")
             return
 
@@ -63,12 +61,14 @@ class Account():
         try:
             # This function attempts to insert a new user record into the database
             # It will raise an sqlite3.IntegrityError if the username already exists
-            self.db.insert_user(username, pw)
+            self.db.insert_user(un, pw)
             self.gui.show_message("success", "New user has been created") # If the insertion is successful, display a success message
             print("User signed up successfully!")
             
-            self.gui.menu_page(username) #Opens the main menu page
+            self.gui.menu_page(un) #Opens the main menu page
         # Handle the case where the username already exists in the database
-        except sqlite3.IntegrityError:
+        except sqlite3.IntegrityError as e:
             # Display an error message prompting the user to choose a different username
             self.gui.show_message("error", "Username already exists. Please choose a different username.")
+            print(f"Error adding user: {e}")
+            return
