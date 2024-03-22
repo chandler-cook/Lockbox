@@ -9,6 +9,13 @@ class GUI():
         self.account = account_instance
         self.db = db_instance
         self.startup_page()
+        self.root.bind("<Return>", self.on_enter_press) # Binds the action of pressing enter/return key to calling the on_enter_press method to be used by the window
+        #=========================================================================================================================
+        # **NOTE**: There is an error in the terminal anytime the user presses the 
+        # enter/return key outside of the the login/signup page. This was happening before I implemented
+        # the enter key functionality. Not sure if there is a way to remove this, but press the enter key
+        # in any page besides the login/signup page, and you will see error in terminal.
+        # This doesn't hinder user experience, simply an annoying message in the terminal, is it possible to get rid of tho?
 
     # Define a method to remove all child widgets from the root widget
     def clear_widgets(self):
@@ -26,6 +33,16 @@ class GUI():
             messagebox.showerror("Error", message)
         elif message_type == "success" or  message_type == "Success":
             messagebox.showinfo("Success", message)
+
+    # Defines a method that allows devs to specify any button they wish to be made pressable by the enter key
+    def on_enter_press(self, event):
+        # If the user is on a certain page, defined by a page identifier, then invoke a specified button
+        if self.current_page == 'login':
+            self.login_btn.invoke()
+        elif self.current_page == 'signup':
+            self.signup_btn.invoke()
+        # To add more enter key functionality for buttons, simply create a page specifier inside of the 
+        # page method declaration that the button is declared in, and then follow the structure of the code seen above.       
 
     def startup_page(self):
 
@@ -49,6 +66,8 @@ class GUI():
 
     # Define the method for displaying the login page
     def login_page(self):
+        # Page identifier used by on_enter_press method
+        self.current_page = 'login'
 
         self.clear_widgets() # Clear any existing widgets to prepare for displaying the login interface
 
@@ -65,8 +84,8 @@ class GUI():
 
         # Creates a button, labeled "Log In", for submitting the login information
         # The button is linked to perform_login, which attempts to authenticate the user with the entered credentials
-        login_btn = CTkButton(self.root, text="Log In", command=lambda:self.account.perform_login(username_entry.get(), pw_entry.get()))
-        login_btn.pack() # Add the login button to the application window
+        self.login_btn = CTkButton(self.root, text="Log In", command=lambda:self.account.perform_login(username_entry.get(), pw_entry.get()))
+        self.login_btn.pack() # Add the login button to the application window
 
         # Creates a back button, labeled "←", for returning to the startup page 
         # The button is linked to startup_page, which takes the user back to the initial screen of the application
@@ -75,6 +94,8 @@ class GUI():
 
     # Define the method to display the sign-up page
     def signup_page(self):
+        # Page identifier used by on_enter_press method
+        self.current_page = 'signup'
         # First, clear any existing widgets from the display
         # This ensures that the sign-up page starts with a clean slate
         self.clear_widgets()
@@ -100,8 +121,8 @@ class GUI():
 
         # Create a sign-up button that, when clicked, calls the perform_signup method
         # This method is presumably responsible for processing the sign-up information
-        signup_btn = CTkButton(self.root, text="Sign Up", command=lambda:self.account.perform_signup(username_entry.get(), pw_entry.get(), confirm_pw_entry.get()))
-        signup_btn.pack()
+        self.signup_btn = CTkButton(self.root, text="Sign Up", command=lambda:self.account.perform_signup(username_entry.get(), pw_entry.get(), confirm_pw_entry.get()))
+        self.signup_btn.pack()
 
         # Create a back button allowing users to return to the previous page (likely the startup page)
         # This is helpful in case the user decides not to sign up or wants to return to the login page
