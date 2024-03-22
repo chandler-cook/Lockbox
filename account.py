@@ -52,7 +52,7 @@ class Account():
             return
 
         # Check if the entered password and confirmation password match
-        if pw != cpw:
+        if new_password != confirm_password:
             # If they don't match, print an error message
             self.gui.show_message("error", "The passwords entered do not match. Please try again")
             return

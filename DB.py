@@ -2,33 +2,30 @@ import sqlite3
 import bcrypt
 
 class Database():
-    def __init__(self, gui_instance):
-        self.gui = gui_instance
-        self.account_id = None 
+    def __init__(self):
+        pass
 
-    def create_tables(self):
+    def create_tables():
         
         con = sqlite3.connect("lockbox.db") # Connect to the database
         cur = con.cursor() # Create a cursor object to execute SQL commands
-        
-        
-        # Create the lockbox_accounts table
-        cur.execute('''CREATE TABLE IF NOT EXISTS lockbox_accounts (
-                    lockbox_account_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT NOT NULL UNIQUE,
-                    password TEXT NOT NULL)''')
 
-        # id: website id for multiple websites
-        # lockbox_account_id: id that is the same as the users id to connect user to their websites
-        # website name: name of wesbite
-        # website_password: password for website
+        # Create lockbox_accounts table if it doesn't exist
+        cur.execute('''CREATE TABLE IF NOT EXISTS lockbox_accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )''')
+
+        # Create websites table if it doesn't exist
         cur.execute('''CREATE TABLE IF NOT EXISTS websites (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    lockbox_account_id INTEGER,
-                    website_name TEXT NOT NULL,
-                    website_username TEXT NOT NULL,
-                    website_password TEXT NOT NULL,
-                    FOREIGN KEY(lockbox_account_id) REFERENCES lockbox_accounts(lockbox_account_id))''')
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lockbox_account_id INTEGER NOT NULL,
+            website_name TEXT NOT NULL,
+            website_username TEXT NOT NULL,
+            website_password TEXT NOT NULL,
+            FOREIGN KEY (lockbox_account_id) REFERENCES lockbox_accounts(id)
+        )''')
 
         # Commit changes and close connection
         con.commit()
@@ -102,14 +99,13 @@ class Database():
 
             # Execute a SQL query to select the ID from the 'lockbox_accounts' table
             # where the 'username' column matches the provided username
-            cur.execute("SELECT lockbox_account_id FROM lockbox_accounts WHERE username = ?", (username,))
+            cur.execute("SELECT id FROM lockbox_accounts WHERE username = ?", (username,))
             # Fetch the first row of the results
             result = cur.fetchone()
 
             # Check if a result was found
             if result:
-                self.account_id = result[0]
-                return self.account_id  # Return the account ID (first column of the row) if found
+                return result[0]  # Return the account ID (first column of the row) if found
             else:
                 return None  # Return None if there was no match for the username
         except sqlite3.Error as e:
@@ -158,9 +154,9 @@ class Database():
         # Handle any exceptions that occur during the database insert operation
         except Exception as e:
             # If an exception occurs, show an error message with the exception details
-            self.gui.show_message("error", "Failed to save website details. Error: " + str(e))
+            self.show_message("error", "Failed to save website details. Error: " + str(e))
 
-        self.gui.menu_page(username)
+        self.menu_page()
 
     # Define a method to check if website data exists for the user's account
     def check_website_data(self):
@@ -170,7 +166,7 @@ class Database():
 
         # Execute a SQL query to select all entries from the 'websites' table
         # where the 'lockbox_account_id' matches the user's profile ID
-        cur.execute("SELECT * FROM websites WHERE lockbox_account_id = ?", (self.account_id,))
+        cur.execute("SELECT * FROM websites WHERE lockbox_account_id = ?", (self.profile_id,))
         website_data = cur.fetchall() # Fetch all rows of the query result
 
         con.close() # Close the database connection to free resources
@@ -181,4 +177,4 @@ class Database():
 
 
     # Call create_tables function to ensure tables exist
-    # create_tables(self)
+    create_tables()
