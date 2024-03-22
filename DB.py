@@ -33,18 +33,14 @@ class Database():
 
     def insert_user(self, username, password):
         try:
-
-            un = username
-            pw = password
-
             con = sqlite3.connect("lockbox.db") # Connect to the database
             cur = con.cursor() # Create a cursor object to execute SQL commands
 
             # Hash the password before storing it in the database
-            hashed_password = bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt())
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
             # Insert the new user into the lockbox_accounts table
-            cur.execute("INSERT INTO lockbox_accounts (username, password) VALUES (?, ?)", (un, hashed_password))
+            cur.execute("INSERT INTO lockbox_accounts (username, password) VALUES (?, ?)", (username, hashed_password))
             con.commit()
             
             # For error checking
@@ -53,11 +49,9 @@ class Database():
             
         except sqlite3.IntegrityError as e:
             print(f"Error adding user: {e}")
-            return
             
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            return
             
         
     def authenticate_user(self, username, password):
@@ -117,13 +111,13 @@ class Database():
             if con:
                 con.close()
 
-    def insert_new_website(self, account_id, website_name, website_username, website_password):
+    def insert_new_website(self, username, website_name, website_username, website_password):
         
         con = sqlite3.connect("lockbox.db") # Connect to the database
         cur = con.cursor() # Create a cursor object to execute SQL commands
 
         # Insert the new website into the websites table
-        cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES ((SELECT lockbox_account_id FROM lockbox_accounts WHERE username=?), ?, ?, ?)", (account_id, website_name, website_username, website_password))
+        cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES ((SELECT lockbox_account_id FROM lockbox_accounts WHERE username=?), ?, ?, ?)", (username, website_name, website_username, website_password))
         con.commit()
 
         con.close() # Close connection
@@ -138,10 +132,10 @@ class Database():
         website_password = website_pw_entry
         
         # Need a way to get username
-        un = username
+        
         # Call the method to get the account ID for the current user based on their username
         # This is necessary to relate the website details with the specific user account in the database
-        account_id = self.get_user_account_id(un)
+        account_id = self.get_user_account_id(username)
         print(account_id)
 
         # Attempt to insert the new website details into the database

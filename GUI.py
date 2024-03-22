@@ -125,14 +125,12 @@ class GUI():
         # This creates a view websites button 
         # Clicking this button will invoke the view_websites_page method, allowing the user to see a list
         # of websites associated with their account
-        view_websites_btn = CTkButton(self.root, text="View Websites", command=lambda:self.view_websites_page(un))
+        view_websites_btn = CTkButton(self.root, text="View Websites", command=self.view_websites_page)
         view_websites_btn.pack() # Adds view website button to application window
 
     # Define a method to display the page for adding new website information
     def add_website_page(self):
         
-        un = username
-
         self.clear_widgets() # Clear any previously displayed widgets to prepare for new content
 
         # Create and display a label to indicate this page is for adding new website details
@@ -159,7 +157,7 @@ class GUI():
 
         # Create a back button that allows users to return to the main menu
         # This provides a convenient way to navigate away from the add website page without saving
-        back_button = CTkButton(self.root, text="←", command=lambda:self.menu_page(un))
+        back_button = CTkButton(self.root, text="←", command=self.menu_page)
         back_button.pack()
 
     # Define the method to display the webpage credentials associated with the user
@@ -176,19 +174,19 @@ class GUI():
         # for all entries associated with the current user's lockbox account
         cur.execute("SELECT website_name, website_username, website_password FROM websites WHERE lockbox_account_id = (SELECT id FROM lockbox_accounts WHERE username = ?)", (self.username,))
         # Fetch all rows of the query result, storing them in `self.website_data`
-        website_data = cur.fetchall()
+        self.website_data = cur.fetchall()
 
         # Close the database connection to free resources
         con.close()
 
         # Check if any website data was found for the user
-        if website_data:
+        if self.website_data:
             # If data is found, display a label indicating the following content will be the user's websites
             website_label = CTkLabel(self.root, text="Your Websites:")
             website_label.pack()
 
             # Loop through each website data entry
-            for website in website_data:
+            for website in self.website_data:
                 # Unpack the website information
                 website_name, website_username, website_password = website
                 # Format the website information into a string
@@ -203,5 +201,5 @@ class GUI():
 
         # Add a back button to the GUI that, when clicked, will call the menu_page method
         # to return the user to the main menu
-        back_button = CTkButton(self.root, text="← Back to Menu", command=lambda:self.menu_page(un))
+        back_button = CTkButton(self.root, text="← Back to Menu", command=self.menu_page)
         back_button.pack()
