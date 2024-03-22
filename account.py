@@ -54,7 +54,7 @@ class Account():
             return
 
         # Check if the entered password and confirmation password match
-        if new_password != confirm_password:
+        if pw != cpw:
             # If they don't match, print an error message
             self.gui.show_message("error", "The passwords entered do not match. Please try again")
             return
