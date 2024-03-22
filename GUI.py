@@ -108,17 +108,19 @@ class GUI():
         back_button.pack()
 
     # Define the method to display the main menu options to the user
-    def menu_page(self):
-
+    def menu_page(self, username):
+        
         self.clear_widgets() # Clear any existing widgets to prepare for displaying new options
 
+        # accessing username
+        un = username
         # Check if there's website data associated with the user's profile
         if not self.db.check_website_data():
             # If no website data is found, provide an option to add a new website
             # This creates a button labeled "Add New Website"
             # Clicking this button will invoke the add_website_page method, leading the user to a page
             # where they can enter details for a new website
-            add_website_btn = CTkButton(self.root, text="Add New Website", command=self.add_website_page)
+            add_website_btn = CTkButton(self.root, text="Add New Website", command=lambda:self.add_website_page(un))
             add_website_btn.pack() # Display the button using pack geometry manager, which adds it to the application window
 
         # Regardless of whether website data exists, provide an option to view websites
@@ -129,7 +131,7 @@ class GUI():
         view_websites_btn.pack() # Adds view website button to application window
 
     # Define a method to display the page for adding new website information
-    def add_website_page(self):
+    def add_website_page(self, username):
         
         self.clear_widgets() # Clear any previously displayed widgets to prepare for new content
 
@@ -152,7 +154,7 @@ class GUI():
 
         # Create a button labeled "Save" that, when clicked, calls the save_website_details method
         # This method is presumably responsible for processing and storing the entered website information
-        save_btn = CTkButton(self.root, text="Save", command=lambda:self.db.save_website_details(website_url_entry.get(), website_username_entry.get(), website_pw_entry.get()))
+        save_btn = CTkButton(self.root, text="Save", command=lambda:self.db.save_website_details(username, website_url_entry.get(), website_username_entry.get(), website_pw_entry.get()))
         save_btn.pack()
 
         # Create a back button that allows users to return to the main menu
@@ -161,7 +163,9 @@ class GUI():
         back_button.pack()
 
     # Define the method to display the webpage credentials associated with the user
-    def view_websites_page(self):
+    def view_websites_page(self, username):
+        
+        un = username
         # Clear the current GUI widgets to prepare for new content
         self.clear_widgets()
 
@@ -172,7 +176,7 @@ class GUI():
 
         # Execute a SQL query to select website name, username, and password
         # for all entries associated with the current user's lockbox account
-        cur.execute("SELECT website_name, website_username, website_password FROM websites WHERE lockbox_account_id = (SELECT id FROM lockbox_accounts WHERE username = ?)", (self.username,))
+        cur.execute("SELECT website_name, website_username, website_password FROM websites WHERE lockbox_account_id = (SELECT id FROM lockbox_accounts WHERE username = ?)", (un,))
         # Fetch all rows of the query result, storing them in `self.website_data`
         self.website_data = cur.fetchall()
 
