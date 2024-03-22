@@ -60,6 +60,12 @@ class Account():
             # If they don't match, print an error message
             self.gui.show_message("error", "The passwords entered do not match. Please try again")
             return
+        
+        # Check if the username already exists
+        if self.db.check_user(un):
+            # If the username already exists, display an error message
+            self.gui.show_message("error", "Username already exists. Please choose a different username.")
+            return
 
         # Attempt to create a new user with the provided credentials
         try:
@@ -70,27 +76,32 @@ class Account():
             print("User signed up successfully!")
             self.gui.login_page() #Opens the main menu page
         # Handle the case where the username already exists in the database
-        except sqlite3.IntegrityError:
-            # Display an error message prompting the user to choose a different username
-            self.gui.show_message("error", "Username already exists. Please choose a different username.")
-            return
-        # Method for generating a password based on the parameters set by the user
+        except Exception as e:
+            # Handle any other exceptions that might occur during the signup process
+            self.gui.show_message("error", f"Failed to sign up. Error: {str(e)}")
+
+    # Method for generating a password based on the parameters set by the user
     def generate_pass(self, username, length, upper, lower, digit, special):
-        un=username
-        # Password length variable
-        pass_len = int(length.get())
+        
+        un = username
+        
+        pass_len = int(length.get()) # Password length variable
+        
         # Variables holding value of checked boxes (1 = checked, 0 = unchecked)
         upperVar = upper.get()
         lowerVar = lower.get()
         digitVar = digit.get()
         specialVar = special.get()
+        
         #Initialize character bank and blank new password list for generation
         char_bank = ''
         new_pass = []
+
         if (upperVar+lowerVar+digitVar+specialVar) == 0:
             self.gui.show_message('error', 'You must select at least one password option to generate a new password.\nPlease try again.')
             self.gui.generate_pass_page(un)
             return
+        
         # IF structure for determining what characters to include in the character bank the generator will chose from
         # Also ensures there is at least one instance of each user specified character
         if upperVar == 1:
@@ -114,9 +125,11 @@ class Account():
         random.shuffle(new_pass)
         # Convert the list of characters back into a string
         new_pass = ''.join(new_pass)    
-        # Copies the Generated password to user's clipboard
-        pyperclip.copy(new_pass)
+        
+        pyperclip.copy(new_pass) # Copies the Generated password to user's clipboard
+        
         # Success Message
         self.gui.show_message("success", f"Your generated password is: {new_pass}\nYour password has been automaticaly copied to the clipboard." )
+        
         # Go back to main menu after exiting success message
         self.gui.menu_page(un)

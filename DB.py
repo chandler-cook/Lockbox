@@ -34,28 +34,42 @@ class Database():
         con.commit()
         con.close()
 
-    def insert_user(self, username, password):
+    def check_user(self, username):
+
+        un = username
+
         try:
-            con = sqlite3.connect("lockbox.db") # Connect to the database
-            cur = con.cursor() # Create a cursor object to execute SQL commands
+            con = sqlite3.connect("lockbox.db")  # Connect to the database
+            cur = con.cursor()  # Create a cursor object to execute SQL commands
 
-            # Hash the password before storing it in the database
-            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            # Execute a SQL query to select the username from the 'lockbox_accounts' table
+            # where the 'username' column matches the provided username
+            cur.execute("SELECT username FROM lockbox_accounts WHERE username = ?", (un,))
+            result = cur.fetchone()  # Fetch the first row of the results
 
-            # Insert the new user into the lockbox_accounts table
-            cur.execute("INSERT INTO lockbox_accounts (username, password) VALUES (?, ?)", (username, hashed_password))
-            con.commit()
-            
-            # For error checking
-            print("User added successfully.")
-            con.close() # Close connection
-            
-        except sqlite3.IntegrityError as e:
-            print(f"Error adding user: {e}")
-            
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-            
+            con.close()  # Close the database connection
+
+            # Return True if the username exists, False otherwise
+            return result is not None
+        except sqlite3.Error as e:
+            # Catch and print any SQLite error encountered during the operation
+            print("Error while checking user:", e)
+            return False  # Return False in case of error
+
+    def insert_user(self, username, password):
+        con = sqlite3.connect("lockbox.db") # Connect to the database
+        cur = con.cursor() # Create a cursor object to execute SQL commands
+
+        # Hash the password before storing it in the database
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # Insert the new user into the lockbox_accounts table
+        cur.execute("INSERT INTO lockbox_accounts (username, password) VALUES (?, ?)", (username, hashed_password))
+        con.commit()
+        
+        # For error checking
+        print("User added successfully.")
+        con.close() # Close connection
         
     def authenticate_user(self, username, password):
         
