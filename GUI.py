@@ -203,48 +203,53 @@ class GUI():
     def view_websites_page(self, username):
         
         un = username
-        # Clear the current GUI widgets to prepare for new content
+
         self.clear_widgets()
 
-        # Establish a connection to the SQLite database named 'lockbox.db'
-        con = sqlite3.connect("lockbox.db")
-        # Create a cursor object to execute SQL queries
-        cur = con.cursor()
+        account_id = self.db.get_user_account_id(un)
+        
+        if account_id is not None:
+            try:
+                # Establish a connection to the SQLite database named 'lockbox.db'
+                con = sqlite3.connect("lockbox.db")
+                # Create a cursor object to execute SQL commands
+                cur = con.cursor()
 
-        # Execute a SQL query to select website name, username, and password
-        # for all entries associated with the current user's lockbox account
-        cur.execute("SELECT website_name, website_username, website_password FROM websites WHERE lockbox_account_id = (SELECT id FROM lockbox_accounts WHERE username = ?)", (un,))
-        # Fetch all rows of the query result, storing them in `self.website_data`
-        self.website_data = cur.fetchall()
+                # Execute a SQL query to select website data for the provided lockbox_account_id
+                cur.execute("SELECT website_name, website_username, website_password FROM websites WHERE lockbox_account_id = ?", (account_id,))
+                # Fetch all rows of the query result
+                self.website_data = cur.fetchall()
 
-        # Close the database connection to free resources
-        con.close()
+                # Close the database connection
+                con.close()
 
-        # Check if any website data was found for the user
-        if self.website_data:
-            # If data is found, display a label indicating the following content will be the user's websites
-            website_label = CTkLabel(self.root, text="Your Websites:")
-            website_label.pack()
+                if self.website_data:
+                    # Display website data
+                    website_label = CTkLabel(self.root, text="Your Websites:")
+                    website_label.pack()
+                    for website in self.website_data:
+                        website_name, website_username, website_password = website
+                        website_info = f"Website: {website_name}, Username: {website_username}, Password: {website_password}"
+                        website_info_label = CTkLabel(self.root, text=website_info)
+                        website_info_label.pack()
+                else:
+                    # No websites found for the user
+                    no_website_label = CTkLabel(self.root, text="No websites found.")
+                    no_website_label.pack()
 
-            # Loop through each website data entry
-            for website in self.website_data:
-                # Unpack the website information
-                website_name, website_username, website_password = website
-                # Format the website information into a string
-                website_info = f"Website: {website_name}, Username: {website_username}, Password: {website_password}"
-                # Display the website information as a label in the GUI
-                website_info_label = CTkLabel(self.root, text=website_info)
-                website_info_label.pack()
+            except sqlite3.Error as e:
+                # Handle any SQLite error encountered during the operation
+                print("Error while retrieving website data:", e)
         else:
-            # If no website data was found for the user, display a message indicating so
-            no_website_label = CTkLabel(self.root, text="No websites found.")
-            no_website_label.pack()
+            # No lockbox_account_id found for the username
+            print("No lockbox account found for the provided username.")
 
         # Add a back button to the GUI that, when clicked, will call the menu_page method
         # to return the user to the main menu
         back_button = CTkButton(self.root, text="← Back to Menu", command=lambda:self.menu_page(un))
         back_button.pack()
-        #Define a method to display the page for generating a new password
+
+    #Define a method to display the page for generating a new password
     def generate_pass_page(self, username):
         
         self.curr_page = 'genpass'

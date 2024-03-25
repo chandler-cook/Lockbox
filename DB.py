@@ -132,13 +132,15 @@ class Database():
             if con:
                 con.close()
 
-    def insert_new_website(self, username, website_name, website_username, website_password):
+    def insert_new_website(self, account_id, website_name, website_username, website_password):
         
+        print(account_id)
+
         con = sqlite3.connect("lockbox.db") # Connect to the database
         cur = con.cursor() # Create a cursor object to execute SQL commands
 
         # Insert the new website into the websites table
-        cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES ((SELECT lockbox_account_id FROM lockbox_accounts WHERE username=?), ?, ?, ?)", (username, website_name, website_username, website_password))
+        cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES (?, ?, ?, ?)", (account_id, website_name, website_username, website_password))
         con.commit()
 
         con.close() # Close connection
