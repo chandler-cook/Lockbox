@@ -166,8 +166,10 @@ class GUI():
     # Define a method to display the page for adding new website information
     def add_website_page(self, username):
         
+        # Used for pressing enter
         self.curr_page = 'addwebsite'
 
+        # Gives the username a variable to be used
         un = username
 
         self.clear_widgets() # Clear any previously displayed widgets to prepare for new content

@@ -132,19 +132,40 @@ class Database():
             if con:
                 con.close()
 
-    def insert_new_website(self, username, website_name, website_username, website_password):
+
+    def insert_new_website(self, user_id, website_name, website_username, website_password):
+        con = sqlite3.connect("lockbox.db")  # Connect to the database
+        cur = con.cursor()  # Create a cursor object to execute SQL commands
+
+        # Need the id to put into the DB
+        user_id = self.get_user_account_id
         
-        con = sqlite3.connect("lockbox.db") # Connect to the database
-        cur = con.cursor() # Create a cursor object to execute SQL commands
-
         # Insert the new website into the websites table
-        cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES ((SELECT lockbox_account_id FROM lockbox_accounts WHERE username=?), ?, ?, ?)", (username, website_name, website_username, website_password))
-        con.commit()
+        sql = '''INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) 
+                VALUES ((SELECT lockbox_account_id FROM lockbox_accounts WHERE username=?), ?, ?, ?)'''
+        values = (user_id, website_name, website_username, website_password)
+        cur.execute(sql, values)
+        
+        # Output the inserted row
+        last_inserted_id = cur.lastrowid  # Get the id of the last inserted row
+        inserted_row = cur.execute("SELECT * FROM websites WHERE id = ?", (last_inserted_id,)).fetchone()
+        print("Inserted Row:", inserted_row)
 
-        con.close() # Close connection
+        con.commit()  # Commit the transaction
+        con.close()   # Close the connection
+
+    # Usage example:
+    # Assuming you have an instance of your class, you can call the function like this:
+    # instance.insert_new_website(username, website_name, website_username, website_password)
+
+
+
 
     # Define the method to save new website details entered by the user
     def save_website_details(self, username, website_url_entry, website_username_entry, website_pw_entry):
+        
+        # Giving the username a variable
+        un = username
         # Retrieve the entered website name from the website name entry widget
         website_url = website_url_entry
         # Retrieve the entered username for the website from the username entry widget
@@ -154,16 +175,36 @@ class Database():
         
         # Need a way to get username
         
+        # error checking to ensure the username is saved
+        print("Before database, username: ", un)
         # Call the method to get the account ID for the current user based on their username
         # This is necessary to relate the website details with the specific user account in the database
-        account_id = self.get_user_account_id(username)
+        account_id = self.get_user_account_id(un)
         print(account_id)
+
 
         # Attempt to insert the new website details into the database
         try:
             # This method attempts to insert a new row into the database table for websites
             # It includes the current username, website name, website username, and password as parameters
             self.insert_new_website(account_id, website_url, website_username, website_password)
+    
+            # Displaying the data just put into the DB
+            
+            # WHERE lockbox_account_id = ? filters the rows based on the lockbox_account_id matching the provided account_id.
+            # ORDER BY id DESC ensures that the results are ordered in descending order based on the id, so the last inserted 
+            # record will be at the top.
+            
+            con = sqlite3.connect("lockbox.db")  # Connect to the database
+            cur = con.cursor()  # Create a cursor object to execute SQL commands
+
+            last_inserted_row = cur.execute("SELECT * FROM websites WHERE lockbox_account_id = ? ORDER BY id", (account_id,)).fetchone()
+    
+            con.commit()  # Commit the transaction
+            con.close()   # Close the connection
+    
+            print(last_inserted_row)
+            
             # If the insert is successful, print a confirmation message
             print("Website details saved successfully!")
         # Handle any exceptions that occur during the database insert operation
