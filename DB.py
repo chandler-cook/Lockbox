@@ -176,16 +176,24 @@ class Database():
         self.gui.menu_page(username)
 
     # Define a method to check if website data exists for the user's account
-    def check_website_data(self):
+    def check_website_data(self, username):
         
+        # Variable to access username
+        un = username
+        
+        # Getting the account id using get function
+        id = self.get_user_account_id(un)
+        
+        # Opening the database 
         con = sqlite3.connect("lockbox.db") # Establish a connection to the SQLite database named 'lockbox.db'
         cur = con.cursor() # Create a cursor object to execute SQL commands
 
         # Execute a SQL query to select all entries from the 'websites' table
         # where the 'lockbox_account_id' matches the user's profile ID
-        cur.execute("SELECT * FROM websites WHERE lockbox_account_id = ?", (self.account_id,))
+        cur.execute("SELECT * FROM websites WHERE lockbox_account_id = ?", (id,))
         website_data = cur.fetchall() # Fetch all rows of the query result
 
+        print(website_data)
         con.close() # Close the database connection to free resources
 
         # Convert the website_data to a boolean and return it

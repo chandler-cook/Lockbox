@@ -145,7 +145,7 @@ class GUI():
         # accessing username
         un = username
         # Check if there's website data associated with the user's profile
-        if not self.db.check_website_data():
+        if not self.db.check_website_data(un):
             # If no website data is found, provide an option to add a new website
             # This creates a button labeled "Add New Website"
             # Clicking this button will invoke the add_website_page method, leading the user to a page
@@ -157,6 +157,13 @@ class GUI():
         # This creates a view websites button 
         # Clicking this button will invoke the view_websites_page method, allowing the user to see a list
         # of websites associated with their account
+        
+    # This creates a button labeled "Add New Website"
+    # Clicking this button will invoke the add_website_page method, leading the user to a page
+     # where they can enter details for a new website
+        add_website_btn = CTkButton(self.root, text="Add New Website", command=lambda:self.add_website_page(un))
+        add_website_btn.pack() # Display the button using pack geometry manager, which adds it to the application window
+
         view_websites_btn = CTkButton(self.root, text="View Websites", command=lambda:self.view_websites_page(un))
         view_websites_btn.pack() # Adds view website button to application window
         # Creates the generate password button in main menu, invoking the generate_pass_page when user clicks

@@ -18,18 +18,13 @@ class Account():
 
         # Attempt to authenticate the user with the provided username and password
         # authenticate_user returns a tuple containing profile data and an error message (if any)
-        profile_data, error_message = self.db.authenticate_user(un, pw)
-
-        self.username = username # Set the username attribute of the class to the entered username
-        self.profile_id = username  
+        profile_data, error_message = self.db.authenticate_user(un, pw) 
 
         # If profile data is received, the login is successful
         if profile_data:
             print("Login successful!")
-            # Reiterate setting the username attribute for clarity or potential previous misuse
-            self.username = username
             # Offer the user options for next steps
-            self.gui.menu_page()
+            self.gui.menu_page(un)
         # If no profile data is found for the user, inform them and direct to add a new website
         elif error_message == "No profile data found for the user.":
             print("No profile data found for the user.")
