@@ -8,6 +8,7 @@ class GUI():
         self.root = root
         self.account = account_instance
         self.db = db_instance
+        self.curr_page = None
         self.startup_page()
         self.root.bind("<Return>", self.on_enter_press) # Binds the action of pressing enter/return key to calling the on_enter_press method to be used by the window
         #=========================================================================================================================
@@ -34,13 +35,19 @@ class GUI():
         elif message_type == "success" or  message_type == "Success":
             messagebox.showinfo("Success", message)
 
-    # Defines a method that allows devs to specify any button they wish to be made pressable by the enter key
+    # Defines a method to specify any button they wish to be made pressable by the enter key
     def on_enter_press(self, event):
         # If the user is on a certain page, defined by a page identifier, then invoke a specified button
-        if self.current_page == 'login':
+        if self.curr_page == 'login':
             self.login_btn.invoke()
-        elif self.current_page == 'signup':
+        elif self.curr_page == 'signup':
             self.signup_btn.invoke()
+        elif self.curr_page == 'addwebsite':
+            self.save_btn.invoke()
+        elif self.curr_page == 'genpass':
+            self.generate_pass_btn.invoke()
+        elif self.curr_page == "menu":
+            pass
         # To add more enter key functionality for buttons, simply create a page specifier inside of the 
         # page method declaration that the button is declared in, and then follow the structure of the code seen above.       
 
@@ -66,8 +73,8 @@ class GUI():
 
     # Define the method for displaying the login page
     def login_page(self):
-        # Page identifier used by on_enter_press method
-        self.current_page = 'login'
+        
+        self.curr_page = 'login' # Page identifier used by on_enter_press method
 
         self.clear_widgets() # Clear any existing widgets to prepare for displaying the login interface
 
@@ -94,11 +101,10 @@ class GUI():
 
     # Define the method to display the sign-up page
     def signup_page(self):
-        # Page identifier used by on_enter_press method
-        self.current_page = 'signup'
-        # First, clear any existing widgets from the display
-        # This ensures that the sign-up page starts with a clean slate
-        self.clear_widgets()
+
+        self.curr_page = 'signup' # Page identifier used by on_enter_press method
+
+        self.clear_widgets() # Clears any existing widgets from the display
 
         # Create and display a label indicating this page is for user sign-up
         signup_label = CTkLabel(self.root, text="Sign Up")
@@ -132,6 +138,8 @@ class GUI():
     # Define the method to display the main menu options to the user
     def menu_page(self, username):
         
+        self.curr_page = 'menu'
+
         self.clear_widgets() # Clear any existing widgets to prepare for displaying new options
 
         # accessing username
@@ -158,6 +166,8 @@ class GUI():
     # Define a method to display the page for adding new website information
     def add_website_page(self, username):
         
+        self.curr_page = 'addwebsite'
+
         un = username
 
         self.clear_widgets() # Clear any previously displayed widgets to prepare for new content
@@ -181,8 +191,8 @@ class GUI():
 
         # Create a button labeled "Save" that, when clicked, calls the save_website_details method
         # This method is presumably responsible for processing and storing the entered website information
-        save_btn = CTkButton(self.root, text="Save", command=lambda:self.db.save_website_details(un, website_url_entry.get(), website_username_entry.get(), website_pw_entry.get()))
-        save_btn.pack()
+        self.save_btn = CTkButton(self.root, text="Save", command=lambda:self.db.save_website_details(un, website_url_entry.get(), website_username_entry.get(), website_pw_entry.get()))
+        self.save_btn.pack()
 
         # Create a back button that allows users to return to the main menu
         # This provides a convenient way to navigate away from the add website page without saving
@@ -236,15 +246,21 @@ class GUI():
         back_button.pack()
         #Define a method to display the page for generating a new password
     def generate_pass_page(self, username):
-        un=username
-        # Clear any existing widgets to prepare for displaying new options
-        self.clear_widgets()
+        
+        self.curr_page = 'genpass'
+
+        un = username
+
+        self.clear_widgets() # Clear any existing widgets to prepare for displaying new options
+        
         # Method for updating the value of the slider
         def sliding_value(value):
             slider_value_label.configure(text=f"Character Count: {int(value)}", font=('Arial Bold', 14))
+        
         # Frame to hold the slider and its value label
         slider_frame = CTkFrame(self.root, fg_color="transparent")
         slider_frame.pack(pady=10)
+        
         # Create the slider
         char_len_slider = CTkSlider(slider_frame,
                                 from_=4,
@@ -255,9 +271,11 @@ class GUI():
                                 command=sliding_value)
         # Initialize slider value to 8, but minimum is 4 as seen above with "from_=4"
         char_len_slider.set(8)
+        
         # Label to display the slider's value, placed above the slider
         slider_value_label = CTkLabel(slider_frame, text=f"Character Count: {char_len_slider.get()}", font=('Arial Bold', 14))
         slider_value_label.pack(side='top')
+        
         # Place slider
         char_len_slider.pack(side='top')
         # Label that tells the user to select one of the password checkbox options
@@ -284,8 +302,8 @@ class GUI():
         d=include_digit_box
         spec=include_special_box
         # Button that calls the generate_pass function, using the shortened variable names as arguments
-        generate_pass_btn = CTkButton(self.root, text="Generate Password", command=lambda:self.account.generate_pass(un, length, u, l, d, spec))
-        generate_pass_btn.pack()
+        self.generate_pass_btn = CTkButton(self.root, text="Generate Password", command=lambda:self.account.generate_pass(un, length, u, l, d, spec))
+        self.generate_pass_btn.pack()
         # Takes user back to main menu if they don't want to generate a password
         back_button = CTkButton(self.root, text="←", command=lambda:self.menu_page(un))
         back_button.pack()
