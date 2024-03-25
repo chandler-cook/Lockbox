@@ -2,7 +2,7 @@ import sqlite3
 import bcrypt
 
 class Database():
-    def __init__(self, gui_instance):
+    def __init__(self, gui_instance, account_instance):
         self.gui = gui_instance
         self.account_id = None 
 
@@ -57,12 +57,14 @@ class Database():
             return False  # Return False in case of error
 
     def insert_user(self, username, password):
+        
+        
         con = sqlite3.connect("lockbox.db") # Connect to the database
         cur = con.cursor() # Create a cursor object to execute SQL commands
 
         # Hash the password before storing it in the database
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
+        
         # Insert the new user into the lockbox_accounts table
         cur.execute("INSERT INTO lockbox_accounts (username, password) VALUES (?, ?)", (username, hashed_password))
         con.commit()

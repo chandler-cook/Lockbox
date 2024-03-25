@@ -22,6 +22,7 @@ class Account():
 
         # If profile data is received, the login is successful
         if profile_data:
+            
             print("Login successful!")
             # Offer the user options for next steps
             self.gui.menu_page(un)
@@ -128,3 +129,10 @@ class Account():
         
         # Go back to main menu after exiting success message
         self.gui.menu_page(un)
+
+    def hash_pass(self, password):
+        
+        # Hash the password before storing it in the database
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        return hashed_password

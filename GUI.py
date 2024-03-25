@@ -144,6 +144,7 @@ class GUI():
 
         # accessing username
         un = username
+        
         # Check if there's website data associated with the user's profile
         if not self.db.check_website_data(un):
             # If no website data is found, provide an option to add a new website
