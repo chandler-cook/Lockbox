@@ -63,7 +63,11 @@ class Database():
         cur = con.cursor() # Create a cursor object to execute SQL commands
 
         # Hash the password before storing it in the database
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        # hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Accessing password variable
+        pswd = password
+        hashed_password = self.account.hash_pass(pswd)
         
         # Insert the new user into the lockbox_accounts table
         cur.execute("INSERT INTO lockbox_accounts (username, password) VALUES (?, ?)", (username, hashed_password))

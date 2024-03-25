@@ -19,12 +19,11 @@ db_instance = Database(gui_instance, None) # Database instance, passing GUI inst
 gui_instance.db = db_instance
 gui_instance.account = None  # Set account_instance to None for now
 db_instance.gui = gui_instance
-db_instance.create_tables()  # Call create_tables() before instantiating Account
 
 # Now instantiate Account
 account_instance = Account(root, gui_instance, db_instance) # Creating an instance of the Account class, passing the root window and just created gui instance
 gui_instance.account = account_instance  # Update account_instance with correct reference
-
+db_instance.account = account_instance
 # Ensures that the database and tables are set up
 db_instance.create_tables()
 

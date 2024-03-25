@@ -3,6 +3,7 @@ import string
 import secrets
 import pyperclip
 import random
+import bcrypt
 
 class Account():
     def __init__(self, root, gui_instance, db_instance):
