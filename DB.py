@@ -144,7 +144,7 @@ class Database():
 
         con = sqlite3.connect("lockbox.db") # Connect to the database
         cur = con.cursor() # Create a cursor object to execute SQL commands
-
+        
         # Insert the new website into the websites table
         cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES (?, ?, ?, ?)", (account_id, website_name, website_username, website_password))
         con.commit()
