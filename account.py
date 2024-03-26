@@ -5,6 +5,11 @@ import pyperclip
 import random
 import bcrypt
 
+from tkinter import messagebox, simpledialog
+from cryptography.fernet import Fernet
+import secrets
+import string
+
 class Account():
     def __init__(self, root, gui_instance, db_instance):
         self.root = root
@@ -137,3 +142,19 @@ class Account():
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         
         return hashed_password
+    
+    # Function to encrypt a password sent
+    def encrypt_info(self, username, password):
+        # Generate a key and instantiate a Fernet instance
+        key = Fernet.generate_key()
+        cipher_suite = Fernet(key)
+        
+        # Returning encreypted version of password
+        return cipher_suite.encrypt(password.encode())
+    
+    # Function to decrypt a password sent in
+    def decrypt_password(encrypted_password):
+        
+        # Returning the decrypted version of the password
+        return cipher_suite.decrypt(encrypted_password).decode()
+ 

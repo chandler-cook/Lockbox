@@ -145,8 +145,11 @@ class Database():
         con = sqlite3.connect("lockbox.db") # Connect to the database
         cur = con.cursor() # Create a cursor object to execute SQL commands
         
+        # Encypting the password before sending to database 
+        encrypted_password = self.account.encrypt_info(website_password)
+        
         # Insert the new website into the websites table
-        cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES (?, ?, ?, ?)", (account_id, website_name, website_username, website_password))
+        cur.execute("INSERT INTO websites (lockbox_account_id, website_name, website_username, website_password) VALUES (?, ?, ?, ?)", (account_id, website_name, website_username, encrypted_password))
         con.commit()
 
         con.close() # Close connection
@@ -205,6 +208,7 @@ class Database():
         # Convert the website_data to a boolean and return it
         # This will be True if website_data contains any entries, False otherwise
         return bool(website_data)
+
 
 
     # Call create_tables function to ensure tables exist
