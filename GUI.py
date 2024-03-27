@@ -1,6 +1,7 @@
 from customtkinter import *
 from tkinter import messagebox
 import sqlite3
+import threading
 
 
 class GUI():
@@ -11,12 +12,37 @@ class GUI():
         self.curr_page = None
         self.startup_page()
         self.root.bind("<Return>", self.on_enter_press) # Binds the action of pressing enter/return key to calling the on_enter_press method to be used by the window
-        #=========================================================================================================================
-        # **NOTE**: There is an error in the terminal anytime the user presses the 
-        # enter/return key outside of the the login/signup page. This was happening before I implemented
-        # the enter key functionality. Not sure if there is a way to remove this, but press the enter key
-        # in any page besides the login/signup page, and you will see error in terminal.
-        # This doesn't hinder user experience, simply an annoying message in the terminal, is it possible to get rid of tho?
+        self.autolock_timer = None  # Placeholder for the autolock timer
+        self.autolock_period = 10  # Set autolock period (e.g., x * y, where x = seconds and y = minutes. Just put 1 number (1-60) if you want only seconds.)
+        # Bind mouse movements and key presses to reset the autolock timer
+        self.root.bind("<Motion>", self.reset_autolock_timer)
+        self.root.bind("<KeyPress>", self.reset_autolock_timer)
+        self.reset_autolock_timer()  # Initialize the autolock timer at application start
+
+    def reset_autolock_timer(self, event=None):
+        # Resets the autolock timer each time user activity is detected
+        if self.autolock_timer is not None:
+            self.autolock_timer.cancel()  # Cancel the existing timer if it's running
+        self.autolock_timer = threading.Timer(self.autolock_period, self.autolock)
+        self.autolock_timer.start()  # Start a new timer
+
+    def autolock(self):
+        # This method is called when the autolock timer expires
+        # Use 'after' to ensure GUI updates are done in the main thread
+        self.root.after(0, self.lock_application)
+
+    def lock_application(self):
+        # This function navigates the user back to the login page
+        # Signifying the application has been auto-locked
+        if self.curr_page == 'login':
+            pass
+        elif self.curr_page == 'signup':
+            pass
+        elif self.curr_page == 'startup':
+            pass
+        else:
+            self.login_page()
+    
 
     # Define a method to remove all child widgets from the root widget
     def clear_widgets(self):
@@ -52,7 +78,7 @@ class GUI():
         # page method declaration that the button is declared in, and then follow the structure of the code seen above.       
 
     def startup_page(self):
-
+        self.curr_page = 'startup'
         self.clear_widgets() # Clear any existing widgets from the interface to start fresh
 
         lockbox_label = CTkLabel(self.root, text="Lockbox", font=('Arial', 30)) # Creates a label widget for the application title "Lockbox"
@@ -137,6 +163,7 @@ class GUI():
 
     # Define the method to display the main menu options to the user
     def menu_page(self, username):
+        self.reset_autolock_timer()
         
         self.curr_page = 'menu'
 
@@ -173,6 +200,7 @@ class GUI():
 
     # Define a method to display the page for adding new website information
     def add_website_page(self, username):
+        self.reset_autolock_timer()
         
         self.curr_page = 'addwebsite'
 
@@ -209,6 +237,7 @@ class GUI():
 
     # Define the method to display the webpage credentials associated with the user
     def view_websites_page(self, username):
+        self.reset_autolock_timer()
         
         un = username
 
@@ -259,6 +288,7 @@ class GUI():
 
     #Define a method to display the page for generating a new password
     def generate_pass_page(self, username):
+        self.reset_autolock_timer()
         
         self.curr_page = 'genpass'
 
