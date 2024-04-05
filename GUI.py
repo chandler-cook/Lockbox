@@ -19,6 +19,19 @@ class GUI():
         self.root.bind("<KeyPress>", self.reset_autolock_timer)
         self.reset_autolock_timer()  # Initialize the autolock timer at application start
 
+        # Bind the window close (X button) event to a method
+        self.root.protocol("WM_DELETE_WINDOW", self.on_window_close)
+
+    # Defines a function to cancel the autolock timer when the user closes the window
+    # This is needed bc if not, when user closes window, the program waits the autolock_period amount of time before
+    # the terminal realises the window is closed, causing the developer to not be able to run anything in the terminal
+    # for the duration of the reamaining autolock_period
+    def on_window_close(self):
+        # This method is called when the window is about to close
+        if self.autolock_timer is not None:
+            self.autolock_timer.cancel()  # Cancel the autolock timer
+        self.root.destroy()  # Close the window
+
     def reset_autolock_timer(self, event=None):
         # Resets the autolock timer each time user activity is detected
         if self.autolock_timer is not None:
